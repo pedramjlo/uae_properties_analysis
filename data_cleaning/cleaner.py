@@ -73,10 +73,20 @@ class DataCleaner:
 
     def convert_to_integer(self):
         try:
-            numeric_cols = ['Rent', 'Beds',	'Baths', ]
+            numeric_cols = ['Rent', 'Beds',	'Baths', 'Area_in_sqft', 'Age_of_listing_in_days']
             self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Int64')
             logging.info("Successfully converted specified columns to integer type")
         except Exception as e:
             logging.error(f"Failed to convert some columns into integers: {e}")
+        return self.df
+    
+    
+    def convert_to_float(self):
+        try:
+            numeric_cols = ['Rent_per_sqft', 'Latitude', 'Longitude']
+            self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Int64')
+            logging.info("Successfully converted specified columns to float type")
+        except Exception as e:
+            logging.error(f"Failed to convert some columns into floats: {e}")
         return self.df
 
