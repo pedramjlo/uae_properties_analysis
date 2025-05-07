@@ -37,15 +37,16 @@ class DataCleaner:
         if "Address" in self.df.columns:
             if column_name not in self.df.columns:
                 try:
-                    self.df[column_name] = self.df["Address"].str.extract([city for city in self.uae_cities])
-                    logging.info(f"The new column {column_name} was created.")
+                    # Match city only if it appears after a comma at the end of the string
+                    pattern = r",\s*(" + "|".join(map(re.escape, self.uae_cities)) + r")\s*$"
+                    self.df[column_name] = self.df["Address"].str.extract(pattern, flags=re.IGNORECASE)
+                    logging.info(f"Extracted city names (end-of-string only) to column {column_name}.")
                 except Exception as e:
-                    logging.error(e)
+                    logging.error(f"Failed to extract city names: {e}")
             else:
-                logging.error(f"The column {column_name} already exists!")
+                logging.error(f"Column {column_name} already exists!")
         else:
-            logging.error(f"The column {column_name} does not exist.")
-
+            logging.error("Column 'Address' does not exist.")
 
     """
     After extracting the city name from the address column and adding it to the new City column,
@@ -73,7 +74,7 @@ class DataCleaner:
 
     def convert_to_integer(self):
         try:
-            numeric_cols = ['Rent', 'Beds',	'Baths', 'Area_in_sqft', 'Age_of_listing_in_days']
+            numeric_cols = ['Rent', 'Beds', 'Baths', 'Area_in_sqft', 'Age_of_listing_in_days']
             self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Int64')
             logging.info("Successfully converted specified columns to integer type")
         except Exception as e:
@@ -84,9 +85,19 @@ class DataCleaner:
     def convert_to_float(self):
         try:
             numeric_cols = ['Rent_per_sqft', 'Latitude', 'Longitude']
-            self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Int64')
+            self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Float64')
             logging.info("Successfully converted specified columns to float type")
         except Exception as e:
             logging.error(f"Failed to convert some columns into floats: {e}")
         return self.df
+    
 
+    def convert_to_date(self):
+        try:
+            date_cols = ['Posted_date']
+            for col in date_cols:
+                self.df[col] = pd.to_datetime(self.df[col], errors='coerce')
+            logging.info("Successfully converted specified columns to datetime.")
+        except Exception as e:
+            logging.error(f"Failed to convert columns to datetime: {e}")
+        return self.df

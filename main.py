@@ -12,8 +12,8 @@ if __name__ == "__main__":
 
 
 
-    #cleaner.create_city_column() # creates the city column and add the extracted city from the address column
-    #cleaner.remove_city_from_address() # removes the city name from the address column 
+    cleaner.create_city_column() # creates the city column and add the extracted city from the address column
+    cleaner.remove_city_from_address() # removes the city name from the address column 
     #cleaner.find_missing_latitude()
     
     #print(data.describe)
@@ -21,8 +21,12 @@ if __name__ == "__main__":
 
 
     cleaner.convert_string_values()
+    cleaner.convert_to_integer()
+    cleaner.convert_to_float()
+    cleaner.convert_to_date()
+
+    print(data.describe)
     
-    # print(data.isna().sum())
 
 
     """
