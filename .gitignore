@@ -1,0 +1,4 @@
+.env
+.venv
+./DB_STORE
+.DB_STORE
