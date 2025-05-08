@@ -1,7 +1,8 @@
 from data_cleaning.cleaner import DataCleaner # data_cleaning is treated as a python package
 from uae_info.uaeInfo import UAEInfo 
 
-from data_visualiser.dataVisualiser import PlotCreator
+
+from data_saving.dataSaver import DataSaver
 
 
 
@@ -14,15 +15,14 @@ if __name__ == "__main__":
 
 
     # EXTRACT CITY NAME FROM ADDRESS COLUMN AND ADD IT TO THE NEW COLUMN CITY
-    #cleaner.create_city_column() 
-    #cleaner.remove_city_from_address() 
+    cleaner.create_city_column() 
+    cleaner.remove_city_from_address() 
     
     #print(data.describe)
     #print(data.columns)
 
 
 
-    #print(data.describe)
 
     # CHECK FOR DATA TYPES
     cleaner.numeric_columns()
@@ -31,10 +31,15 @@ if __name__ == "__main__":
     cleaner.convert_to_date_type()
 
 
+    # HANDLING MISSING VALUES 
+    cleaner.impute_missing_values()
+
+
     
 
 
     # OUTLIERS
+
     """
 
     - Every numeric value column contains high-end and ignorable outliers meaning the distribution is 
@@ -45,11 +50,12 @@ if __name__ == "__main__":
 
     """
 
-    #for column in data.columns:
-        #cleaner.outlier_detection(column)
+    for column in data.columns:
+        cleaner.outlier_detection(column)
 
 
-
+    saver = DataSaver()
+    saver.save_clean_data(data)
     
 
     

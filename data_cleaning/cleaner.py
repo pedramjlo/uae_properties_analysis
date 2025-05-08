@@ -5,6 +5,8 @@ import logging
 
 
 
+
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -97,7 +99,7 @@ class DataCleaner:
     
     
 
-
+    # USING IQR METHOD
     def outlier_detection(self, column):
         if not pd.api.types.is_numeric_dtype(self.df[column]):
             logging.warning(f"Column '{column}' is not numeric. Skipping outlier detection.")
@@ -114,3 +116,15 @@ class DataCleaner:
         percentage = (len(outliers) / len(self.df)) * 100
         logging.info(f"{percentage:.2f}% of the values in column '{column}' are outliers.")
         return outliers
+    
+
+    """
+    Only Latitude and Longitude column contain missing values
+    """
+    def impute_missing_values(self):
+        try:
+            self.df["Latitude"].fillna(0, inplace=True)
+            self.df["Longitude"].fillna(0, inplace=True)
+            logging.info("Imputed missing values in Longitude and Latitude with 0")
+        except Exception as e:
+            logging.warning(f"Failed to impute missing values, {e}")
