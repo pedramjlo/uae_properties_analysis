@@ -65,7 +65,7 @@ class DataCleaner:
     def numeric_columns(self):
         try:
             numeric_cols = self.df.select_dtypes(include=['number']).columns
-            #logging.info(f"Found the numerical values: {numeric_cols}")
+            logging.info(f"Found the numerical values: {numeric_cols}")
             return numeric_cols
         except Exception as e:
             logging.warning(f"Failed to get some numerical columns, {e}")
@@ -77,6 +77,25 @@ class DataCleaner:
             logging.info(f"Found the object(string + date) values: {object_cols}")
         except Exception as e:
             logging.warning(f"Failed to get some object(string + date) columns, {e}")
+
+
+    def date_columns(self):
+        try:
+            date_cols = self.df.select_dtypes(include=['datetime']).columns
+            logging.info(f"Found the object date values: {date_cols}")
+        except Exception as e:
+            logging.warning(f"Failed to get some object date columns, {e}")
+
+
+    def convert_to_date_type(self):
+        try:
+            self.df['Posted_date'] = pd.to_datetime(self.df['Posted_date'], errors='coerce')
+            logging.info("Successfully converted 'Posted_date' to datetime.")
+        except Exception as e:
+            logging.warning(f"Failed to convert 'Posted_date' to datetime type: {e}")
+
+    
+    
 
 
     def outlier_detection(self, column):

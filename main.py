@@ -26,29 +26,27 @@ if __name__ == "__main__":
 
     # CHECK FOR DATA TYPES
     cleaner.numeric_columns()
-    
+    cleaner.object_columns()
+    cleaner.date_columns()
+    cleaner.convert_to_date_type()
 
 
     
 
 
-    
+    # OUTLIERS
     """
-    OUTLIERS:
 
-    - Rents, Area_in_sqft contain high-end and ignorable outliers meaning the distribution is 
+    - Every numeric value column contains high-end and ignorable outliers meaning the distribution is 
     positively skewed. The majority of the data is clustered toward lower values, 
     with a few extremely high values pulling the upper end.
 
-    - 
-
+    - Outliers are not an issue in any case.
 
     """
 
-    #cleaner.outlier_detection("Beds")
-
-    for column in data.columns:
-        cleaner.outlier_detection(column)
+    #for column in data.columns:
+        #cleaner.outlier_detection(column)
 
 
 
