@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import re
 import logging
-from geopy.geocoders import Nominatim
 
 
 logging.basicConfig(
@@ -40,7 +39,7 @@ class DataCleaner:
                     # Match city only if it appears after a comma at the end of the string
                     pattern = r",\s*(" + "|".join(map(re.escape, self.uae_cities)) + r")\s*$"
                     self.df[column_name] = self.df["Address"].str.extract(pattern, flags=re.IGNORECASE)
-                    logging.info(f"Extracted city names (end-of-string only) to column {column_name}.")
+                    logging.info(f"Extracted city names to column {column_name}.")
                 except Exception as e:
                     logging.error(f"Failed to extract city names: {e}")
             else:
@@ -62,42 +61,17 @@ class DataCleaner:
             logging.error("The column 'Address' does not exist.")
 
 
-    def convert_string_values(self):
-        string_columns = ['Address', 'City', 'Type', 'Rent_per_sqft', 'Frequency', 'Furnishing', 'Purpose', 'Location']
+    def check_numeric_columns(self):
         try:
-            self.df[string_columns] = self.df[string_columns].astype(str)
-            logging.info("Successfully converted specified columns to string type")
+            numeric_cols = self.df.select_dtypes(include=['number']).columns
+            logging.info(f"Found the numerical values: {numeric_cols}")
         except Exception as e:
-            logging.error(f"Failed to convert some columns into strings: {e}")
-        return self.df
+            logging.warning(f"Failed to get some numerical columns, {e}")
 
 
-    def convert_to_integer(self):
+    def check_object_columns(self):
         try:
-            numeric_cols = ['Rent', 'Beds', 'Baths', 'Area_in_sqft', 'Age_of_listing_in_days']
-            self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Int64')
-            logging.info("Successfully converted specified columns to integer type")
+            obejct_cols = self.df.select_dtypes(include=['object']).columns
+            logging.info(f"Found the object(string + date) values: {obejct_cols}")
         except Exception as e:
-            logging.error(f"Failed to convert some columns into integers: {e}")
-        return self.df
-    
-    
-    def convert_to_float(self):
-        try:
-            numeric_cols = ['Rent_per_sqft', 'Latitude', 'Longitude']
-            self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Float64')
-            logging.info("Successfully converted specified columns to float type")
-        except Exception as e:
-            logging.error(f"Failed to convert some columns into floats: {e}")
-        return self.df
-    
-
-    def convert_to_date(self):
-        try:
-            date_cols = ['Posted_date']
-            for col in date_cols:
-                self.df[col] = pd.to_datetime(self.df[col], errors='coerce')
-            logging.info("Successfully converted specified columns to datetime.")
-        except Exception as e:
-            logging.error(f"Failed to convert columns to datetime: {e}")
-        return self.df
+            logging.warning(f"Failed to get some object(string + date) columns, {e}")
