@@ -20,13 +20,13 @@ load_dotenv()
 
 
 class LoadToDB:
-    def __init__(self):
+    def __init__(self, file_path="../cleaned_data/cleaned_uae_properties.csv"):
         self.user = os.getenv('DB_USER')
         self.password = os.getenv('DB_PASSWORD')
         self.host = os.getenv('DB_HOST')
         self.port = os.getenv('DB_PORT')
         self.dbname = "uae_properties"
-        self.target_dataset = pd.read_csv("../cleaned_data/cleaned_uae_properties.csv")
+        self.target_dataset = pd.read_csv(file_path)
 
 
     def create_database(self):
@@ -48,7 +48,7 @@ class LoadToDB:
             cur.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(self.dbname)))
             logging.info(f"Database '{self.dbname}' created successfully.")
         else:
-            logging.error(f"Database '{self.dbname}' already exists.")
+            logging.info(f"Database '{self.dbname}' already exists.")
 
 
 
