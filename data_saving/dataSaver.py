@@ -20,3 +20,5 @@ class DataSaver:
             logging.info(f"Cleaned data saved to {file_path}")
         except Exception as e:
             logging.error(f"Failed to save cleaned data: {e}")
+        
+        return file_path

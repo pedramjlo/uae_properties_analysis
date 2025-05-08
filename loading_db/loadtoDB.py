@@ -1,0 +1,79 @@
+import os
+import logging
+import pandas as pd
+
+import psycopg2
+from psycopg2 import sql
+from sqlalchemy import create_engine
+
+from dotenv import load_dotenv
+
+
+logging.basicConfig(
+    level=logging.INFO,  # Set the minimum log level
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Log message format
+    # filename='app.log'  # Log to a file (optional)
+)
+
+load_dotenv()
+
+
+
+class LoadToDB:
+    def __init__(self):
+        self.user = os.getenv('DB_USER')
+        self.password = os.getenv('DB_PASSWORD')
+        self.host = os.getenv('DB_HOST')
+        self.port = os.getenv('DB_PORT')
+        self.dbname = "uae_properties"
+        self.target_dataset = pd.read_csv("../cleaned_data/cleaned_uae_properties.csv")
+
+
+    def create_database(self):
+        # CHECK TO ESTABLISH CONNECTION TO THE DB
+        try:
+            conn = psycopg2.connect(dbname='postgres', user=self.user, password=self.password, host=self.host, port=self.port)
+            conn.autocommit = True  # To allow database creation
+            cur = conn.cursor()
+            logging.info("Connection established successfully")
+        except Exception as e:
+            logging.error(f"Failed to establish connection to the db, {e}")
+
+        # CHECK WHETHER THE DB EXISTS
+        cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (self.dbname,))
+        exists = cur.fetchone()
+
+        # CREATE THE DB IF IT DOESNT EXIST
+        if not exists:
+            cur.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(self.dbname)))
+            logging.info(f"Database '{self.dbname}' created successfully.")
+        else:
+            logging.error(f"Database '{self.dbname}' already exists.")
+
+
+
+        cur.close()
+        conn.close()
+        logging.info("Connection closed.")
+
+
+    def create_engine(self):
+        try:
+            # Create PostgreSQL engine
+            engine = create_engine(f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}")
+            logging.info("PostgreSQL engine created.")
+            return engine
+        except Exception as e:
+            logging.error(f"Failed to create PostgreSQL engine, {e}")
+
+
+    def load_to_db(self):
+        engine = self.create_engine()
+        try:
+            # Load to PostgreSQL (if table exists, replace or append)
+            self.target_dataset.to_sql("uae_properties", engine, index=False, if_exists='replace')  # or 'append'
+        except Exception as e:
+            logging.error(f"Failed to load the data to PostgreSQL, {e}")
+            
+
+
