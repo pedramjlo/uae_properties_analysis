@@ -8,6 +8,9 @@ from sqlalchemy import create_engine
 
 from dotenv import load_dotenv
 
+from urllib.parse import quote_plus
+
+
 
 logging.basicConfig(
     level=logging.INFO,  # Set the minimum log level
@@ -18,11 +21,15 @@ logging.basicConfig(
 load_dotenv()
 
 
+# Dynamically get the root directory of the project
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 
 class LoadToDB:
-    def __init__(self, file_path="../cleaned_data/cleaned_uae_properties.csv"):
+    def __init__(self, file_path=os.path.join(PROJECT_ROOT, "cleaned_data", "cleaned_uae_properties_data.csv")):
         self.user = os.getenv('DB_USER')
-        self.password = os.getenv('DB_PASSWORD')
+        self.password = quote_plus(os.getenv('DB_PASSWORD'))
         self.host = os.getenv('DB_HOST')
         self.port = os.getenv('DB_PORT')
         self.dbname = "uae_properties"
@@ -59,12 +66,13 @@ class LoadToDB:
 
     def create_engine(self):
         try:
-            # Create PostgreSQL engine
-            engine = create_engine(f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}")
+            connection_url = f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
+            engine = create_engine(connection_url)
             logging.info("PostgreSQL engine created.")
             return engine
         except Exception as e:
-            logging.error(f"Failed to create PostgreSQL engine, {e}")
+            logging.error("Failed to create PostgreSQL engine", exc_info=True)
+            raise
 
 
     def load_to_db(self):
@@ -72,6 +80,7 @@ class LoadToDB:
         try:
             # Load to PostgreSQL (if table exists, replace or append)
             self.target_dataset.to_sql("uae_properties", engine, index=False, if_exists='replace')  # or 'append'
+            logging.info("Data loaded to the database successfully ")
         except Exception as e:
             logging.error(f"Failed to load the data to PostgreSQL, {e}")
             

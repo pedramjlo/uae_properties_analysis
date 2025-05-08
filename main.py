@@ -1,7 +1,7 @@
 from data_cleaning.cleaner import DataCleaner # data_cleaning is treated as a python package
 from uae_info.uaeInfo import UAEInfo 
 from data_saving.dataSaver import DataSaver
-from loading_db.createDB import CreateDB
+from loading_db.loadtoDB import LoadToDB
 
 
 
@@ -57,8 +57,8 @@ if __name__ == "__main__":
     saver.save_clean_data(data)
 
 
-    load_to_db = CreateDB()
+    load_to_db = LoadToDB()
     load_to_db.create_database()
-    
-
+    load_to_db.create_engine()
+    load_to_db.load_to_db()
     
