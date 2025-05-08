@@ -1,6 +1,8 @@
 from data_cleaning.cleaner import DataCleaner # data_cleaning is treated as a python package
 from uae_info.uaeInfo import UAEInfo 
 
+from data_visualiser.dataVisualiser import PlotCreator
+
 
 
 if __name__ == "__main__":
@@ -12,8 +14,8 @@ if __name__ == "__main__":
 
 
     # EXTRACT CITY NAME FROM ADDRESS COLUMN AND ADD IT TO THE NEW COLUMN CITY
-    cleaner.create_city_column() 
-    cleaner.remove_city_from_address() 
+    #cleaner.create_city_column() 
+    #cleaner.remove_city_from_address() 
     
     #print(data.describe)
     #print(data.columns)
@@ -23,5 +25,33 @@ if __name__ == "__main__":
     #print(data.describe)
 
     # CHECK FOR DATA TYPES
-    cleaner.check_numeric_columns()
-    cleaner.check_object_columns()
+    cleaner.numeric_columns()
+    
+
+
+    
+
+
+    
+    """
+    OUTLIERS:
+
+    - Rents, Area_in_sqft contain high-end and ignorable outliers meaning the distribution is 
+    positively skewed. The majority of the data is clustered toward lower values, 
+    with a few extremely high values pulling the upper end.
+
+    - 
+
+
+    """
+
+    #cleaner.outlier_detection("Beds")
+
+    for column in data.columns:
+        cleaner.outlier_detection(column)
+
+
+
+    
+
+    

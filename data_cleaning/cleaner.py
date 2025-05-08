@@ -4,6 +4,7 @@ import re
 import logging
 
 
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -61,17 +62,36 @@ class DataCleaner:
             logging.error("The column 'Address' does not exist.")
 
 
-    def check_numeric_columns(self):
+    def numeric_columns(self):
         try:
             numeric_cols = self.df.select_dtypes(include=['number']).columns
-            logging.info(f"Found the numerical values: {numeric_cols}")
+            #logging.info(f"Found the numerical values: {numeric_cols}")
+            return numeric_cols
         except Exception as e:
             logging.warning(f"Failed to get some numerical columns, {e}")
 
 
-    def check_object_columns(self):
+    def object_columns(self):
         try:
-            obejct_cols = self.df.select_dtypes(include=['object']).columns
-            logging.info(f"Found the object(string + date) values: {obejct_cols}")
+            object_cols = self.df.select_dtypes(include=['object']).columns
+            logging.info(f"Found the object(string + date) values: {object_cols}")
         except Exception as e:
             logging.warning(f"Failed to get some object(string + date) columns, {e}")
+
+
+    def outlier_detection(self, column):
+        if not pd.api.types.is_numeric_dtype(self.df[column]):
+            logging.warning(f"Column '{column}' is not numeric. Skipping outlier detection.")
+            return pd.DataFrame()
+
+        Q1 = self.df[column].quantile(0.25)
+        Q3 = self.df[column].quantile(0.75)
+        IQR = Q3 - Q1
+
+        outliers = self.df[
+            (self.df[column] < Q1 - 1.5 * IQR) |
+            (self.df[column] > Q3 + 1.5 * IQR)
+        ]
+        percentage = (len(outliers) / len(self.df)) * 100
+        logging.info(f"{percentage:.2f}% of the values in column '{column}' are outliers.")
+        return outliers
