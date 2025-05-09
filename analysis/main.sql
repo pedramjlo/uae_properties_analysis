@@ -62,7 +62,31 @@ FROM AFFORDABLE_LOCATION_PER_CITY
 ORDER BY "lowest_annual_rent" ASC;
 
 
-SELECT 
-    "Area_in_sqft"
-FROM uae_properties
-WHERE "Beds" = 12;
+-- AVERAGE AREA BY PROPERTY TYPE IN SQUAREFEET UNIT AND THE NUMBER OF BEDROOMS
+WITH AVERAGE_AREA_BY_TYPE AS (
+    SELECT 
+        "City",
+        "Type",
+        ROUND(AVG("Area_in_sqft"), 3) AS average_area_in_sqrft
+    FROM uae_properties
+    GROUP BY "City", "Type"
+),
+AVERAGE_BEDROOMS_BY_TYPE AS (
+    SELECT 
+        "City",
+        "Type",
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY "Beds") AS median_beds_number
+    FROM uae_properties
+    WHERE "Type" NOT IN ('Residential Plot') AND "Beds" <> 0
+    GROUP BY "City", "Type"
+)
+SELECT
+    a."City",
+    a."Type",
+    a."average_area_in_sqrft",
+    b."median_beds_number"
+FROM AVERAGE_AREA_BY_TYPE a
+JOIN AVERAGE_BEDROOMS_BY_TYPE b 
+    ON a."Type" = b."Type"
+    AND a."City" = b."City"
+ORDER BY a."City", a."Type", a."average_area_in_sqrft" DESC;
