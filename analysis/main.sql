@@ -5,24 +5,25 @@ SELECT DISTINCT "City"
 FROM uae_properties;
 
 
--- AVERAGE RENT PER CITY (ANNUAL)
-WITH AVERAGE_RENT_PER_CITY AS (
+-- MEDIAN RENT PER CITY (ANNUAL & MONTHLY)
+WITH MEDIAN_RENT_PER_CITY AS (
     SELECT 
         "City", 
-        AVG("Rent") as "average_annual_rent"
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY "Rent") AS "median_annual_rent"
     FROM uae_properties
     GROUP BY "City"
 )
 SELECT 
     "City", 
-    ROUND("average_annual_rent", 2) as "average_annual_rent",
-    RANK() OVER (ORDER BY "average_annual_rent" DESC) AS Rank
-FROM AVERAGE_RENT_PER_CITY;
+    "median_annual_rent" as "median_annual_rent",
+    ROUND(("median_annual_rent" / 12)::numeric, 2) AS "median_monthly_rent",
+    RANK() OVER (ORDER BY "median_annual_rent" DESC) AS Rank
+FROM MEDIAN_RENT_PER_CITY;
 
 
 
 
--- TOP 20 MOST EXPENSIVE LOCATIONS
+-- TOP 20 MOST EXPENSIVE LOCATIONS (ACCROSS THE COUNTRY)
 WITH EXPENSIVE_LOCATION_PER_CITY as (
     SELECT
         "City",
@@ -43,7 +44,7 @@ LIMIT 20;
 
 
 
--- TOP 20 MOST AFFORDABLE LOCATIONS
+-- TOP 20 MOST AFFORDABLE LOCATIONS (ACCROSS THE COUNTRY)
 WITH AFFORDABLE_LOCATION_PER_CITY as (
     SELECT
         "City",
@@ -111,4 +112,27 @@ SELECT
     average_rent
 FROM MOST_EXPENSIVE_LOCATION
 WHERE row_number = 1
-ORDER BY average_rent DESC;
+ORDER BY "City" ASC;
+
+
+
+-- MOST AFFORDABLE LOCATION IN EVERY CITY (ON AVERAGE RENT RATE)
+WITH MOST_AFFORDABLE_LOCATION AS (
+    SELECT 
+        "City",
+        "Location",
+        ROUND(AVG("Rent"), 2) AS average_rent,
+        ROW_NUMBER() OVER (
+            PARTITION BY "City"
+            ORDER BY AVG("Rent") ASC
+        ) AS row_number
+    FROM uae_properties
+    GROUP BY "City", "Location"
+)
+SELECT 
+    "City",
+    "Location",
+    average_rent
+FROM MOST_AFFORDABLE_LOCATION
+WHERE row_number = 1
+ORDER BY "City" ASC;
