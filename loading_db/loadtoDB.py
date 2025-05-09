@@ -58,7 +58,7 @@ class LoadToDB:
             logging.info(f"Database '{self.dbname}' already exists.")
 
 
-
+        # CLOSING THE CONNECTION
         cur.close()
         conn.close()
         logging.info("Connection closed.")

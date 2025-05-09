@@ -5,18 +5,18 @@ SELECT DISTINCT "City"
 FROM uae_properties;
 
 
--- AVERAGE RENT PER CITY (PER MONTH)
+-- AVERAGE RENT PER CITY (ANNUAL)
 WITH AVERAGE_RENT_PER_CITY AS (
     SELECT 
         "City", 
-        AVG("Rent") as "Average_rent"
+        AVG("Rent") as "average_annual_rent"
     FROM uae_properties
-    GROUP BY "City"
+    GROUP BY "City", "Address"
 )
 SELECT 
     "City", 
-    ROUND("Average_rent", 2),
-    RANK() OVER (ORDER BY "Average_rent" DESC) AS Rank
+    ROUND("average_annual_rent", 2) as "average_annual_rent",
+    RANK() OVER (ORDER BY "average_annual_rent" DESC) AS Rank
 FROM AVERAGE_RENT_PER_CITY;
 
 
@@ -27,16 +27,20 @@ WITH EXPENSIVE_LOCATION_PER_CITY as (
     SELECT
         "City",
         "Location",
-        MAX("Rent") as "Highest_Rent",
+        "Address",
+        MAX("Rent") as "highest_annual_rent"
     FROM uae_properties
-    GROUP BY "City", "Location"
+    GROUP BY "City", "Location",  "Address"
 )
 SELECT 
     "City",
     "Location",
-    "Highest_Rent"
+     "Address",
+    "highest_annual_rent"
 FROM EXPENSIVE_LOCATION_PER_CITY
-ORDER BY "Highest_Rent" DESC;
+ORDER BY "highest_annual_rent" DESC
+LIMIT 20;
+
 
 
 -- TOP 20 MOST AFFORDABLE LOCATIONS
@@ -44,14 +48,21 @@ WITH AFFORDABLE_LOCATION_PER_CITY as (
     SELECT
         "City",
         "Location",
-        MIN("Rent") as "Lowest_Rent"
+        "Address",
+        MIN("Rent") as "lowest_annual_rent"
     FROM uae_properties
-    GROUP BY "City", "Location"
+    GROUP BY "City", "Location", "Address"
 )
 SELECT 
     "City",
     "Location",
-    "Lowest_Rent"
+    "Address",
+    "lowest_annual_rent"
 FROM AFFORDABLE_LOCATION_PER_CITY
-ORDER BY "Lowest_Rent" ASC;
+ORDER BY "lowest_annual_rent" ASC;
 
+
+SELECT 
+    "Area_in_sqft"
+FROM uae_properties
+WHERE "Beds" = 12;

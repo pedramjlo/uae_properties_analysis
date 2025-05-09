@@ -136,9 +136,14 @@ class DataCleaner:
     """
     def drop_missing_rent_values(self):
         try:
-            self.df = self.df[self.df["Rent"].notnull() & (self.df["Rent"] > 100)]
-            logging.info("Dropped rows with missing Rent values.")
+            """
+            A minimum threshold of 700 AED has been set for rent rates; 
+            any records falling below this threshold are dropped.
+            """
+            self.df = self.df[self.df["Rent"].notnull() & (self.df["Rent"] > 700)]
+            logging.info("Dropped rows with missing Rent values and below 700 AED.")
         except Exception as e:
             logging.warning(f"Failed to drop rows with missing Rent values. {e}")
 
-
+    
+    
