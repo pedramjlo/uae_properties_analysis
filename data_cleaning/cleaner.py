@@ -128,3 +128,17 @@ class DataCleaner:
             logging.info("Imputed missing values in Longitude and Latitude with 0")
         except Exception as e:
             logging.warning(f"Failed to impute missing values, {e}")
+
+
+
+    """
+    DROP ROWS WHERE RENT VALUES ARE MISSING SINCE IT MAKES THE ANALYSIS USELESS
+    """
+    def drop_missing_rent_values(self):
+        try:
+            self.df = self.df[self.df["Rent"].notnull() & (self.df["Rent"] > 100)]
+            logging.info("Dropped rows with missing Rent values.")
+        except Exception as e:
+            logging.warning(f"Failed to drop rows with missing Rent values. {e}")
+
+
