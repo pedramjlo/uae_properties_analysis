@@ -11,7 +11,7 @@ WITH AVERAGE_RENT_PER_CITY AS (
         "City", 
         AVG("Rent") as "average_annual_rent"
     FROM uae_properties
-    GROUP BY "City", "Address"
+    GROUP BY "City"
 )
 SELECT 
     "City", 
@@ -90,3 +90,25 @@ JOIN AVERAGE_BEDROOMS_BY_TYPE b
     ON a."Type" = b."Type"
     AND a."City" = b."City"
 ORDER BY a."City", a."Type", a."average_area_in_sqrft" DESC;
+
+
+-- MOST EXPENSIVE LOCATION IN EVERY CITY (ON AVERAGE RENT RATE)
+WITH MOST_EXPENSIVE_LOCATION AS (
+    SELECT 
+        "City",
+        "Location",
+        ROUND(AVG("Rent"), 2) AS average_rent,
+        ROW_NUMBER() OVER (
+            PARTITION BY "City"
+            ORDER BY AVG("Rent") DESC
+        ) AS row_number
+    FROM uae_properties
+    GROUP BY "City", "Location"
+)
+SELECT 
+    "City",
+    "Location",
+    average_rent
+FROM MOST_EXPENSIVE_LOCATION
+WHERE row_number = 1
+ORDER BY average_rent DESC;
