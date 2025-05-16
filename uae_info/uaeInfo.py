@@ -82,3 +82,12 @@ class UAEInfo:
     ]
         return uae_cities
 
+import requests
+
+url = 'https://releaseeuaestat.fcsc.gov.ae/rest/data/FCSA,DF_NA_COMP_CUR,3.4.0/.A.............?startPeriod=2015&dimensionAtObservation=AllDimensions'
+
+params = {
+    "city": "Dubai"
+}
+
+print(requests.get(url, params=None).json)

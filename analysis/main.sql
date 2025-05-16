@@ -1,11 +1,10 @@
-SELECT * FROM uae_properties;
-
--- AVAILABLE CITIES IN THE DATASET
+-- Active: 1744916696249@@localhost@5432@uae_properties
+-- ALL_CITIES 
 SELECT DISTINCT "City"
 FROM uae_properties;
 
 
--- MEDIAN RENT PER CITY (ANNUAL & MONTHLY)
+-- name: MEDIAN_RENT_PER_CITY
 WITH MEDIAN_RENT_PER_CITY AS (
     SELECT 
         "City", 
@@ -23,47 +22,48 @@ FROM MEDIAN_RENT_PER_CITY;
 
 
 
--- TOP 20 MOST EXPENSIVE LOCATIONS (ACCROSS THE COUNTRY)
+-- name: TOP_20_MOST_EXPENSIVE_LOCATIONS
 WITH EXPENSIVE_LOCATION_PER_CITY as (
     SELECT
         "City",
         "Location",
         "Address",
-        MAX("Rent") as "highest_annual_rent"
+        "Rent" as "annual_rent"
     FROM uae_properties
-    GROUP BY "City", "Location",  "Address"
+    GROUP BY "City", "Location",  "Address", "annual_rent"
 )
 SELECT 
     "City",
     "Location",
      "Address",
-    "highest_annual_rent"
+    "annual_rent"
 FROM EXPENSIVE_LOCATION_PER_CITY
-ORDER BY "highest_annual_rent" DESC
+ORDER BY "annual_rent" DESC
 LIMIT 20;
 
 
 
--- TOP 20 MOST AFFORDABLE LOCATIONS (ACCROSS THE COUNTRY)
+-- name: MOST_AFFORDABLE_LOCATIONS
 WITH AFFORDABLE_LOCATION_PER_CITY as (
     SELECT
         "City",
         "Location",
         "Address",
-        MIN("Rent") as "lowest_annual_rent"
+        "Rent" as "annual_rent"
     FROM uae_properties
-    GROUP BY "City", "Location", "Address"
+    GROUP BY "City", "Location", "Address", "annual_rent"
 )
 SELECT 
     "City",
     "Location",
     "Address",
-    "lowest_annual_rent"
+    "annual_rent"
 FROM AFFORDABLE_LOCATION_PER_CITY
-ORDER BY "lowest_annual_rent" ASC;
+ORDER BY "annual_rent" ASC;
 
 
--- AVERAGE AREA BY PROPERTY TYPE IN SQUAREFEET UNIT AND THE NUMBER OF BEDROOMS
+
+-- name: AVERAGE_AREA_BY_PROPERTY_TYPE
 WITH AVERAGE_AREA_BY_TYPE AS (
     SELECT 
         "City",
@@ -90,10 +90,11 @@ FROM AVERAGE_AREA_BY_TYPE a
 JOIN AVERAGE_BEDROOMS_BY_TYPE b 
     ON a."Type" = b."Type"
     AND a."City" = b."City"
-ORDER BY a."City", a."Type", a."average_area_in_sqrft" DESC;
+ORDER BY a."City", a."Type", a."average_area_in_sqrft" DESC
+LIMIT 20;
 
 
--- MOST EXPENSIVE LOCATION IN EVERY CITY (ON AVERAGE RENT RATE)
+-- name: MOST_EXPENSIVE_LOCATIONS_BY_CITY 
 WITH MOST_EXPENSIVE_LOCATION AS (
     SELECT 
         "City",
@@ -116,12 +117,12 @@ ORDER BY "City" ASC;
 
 
 
--- MOST AFFORDABLE LOCATION IN EVERY CITY (ON AVERAGE RENT RATE)
+-- name: MOST_AFFORDABLE_LOCATIONS_BY_CITY
 WITH MOST_AFFORDABLE_LOCATION AS (
     SELECT 
         "City",
         "Location",
-        ROUND(AVG("Rent"), 2) AS average_rent,
+        ROUND(AVG("Rent"), 2) AS "average_annual_rent",
         ROW_NUMBER() OVER (
             PARTITION BY "City"
             ORDER BY AVG("Rent") ASC
@@ -132,7 +133,10 @@ WITH MOST_AFFORDABLE_LOCATION AS (
 SELECT 
     "City",
     "Location",
-    average_rent
+    "average_annual_rent"
 FROM MOST_AFFORDABLE_LOCATION
 WHERE row_number = 1
 ORDER BY "City" ASC;
+
+
+

@@ -5,8 +5,10 @@ from loading_db.loadtoDB import LoadToDB
 
 
 
+
+
 if __name__ == "__main__":
-    raw_dataset = "/Users/pedramjalali/documents/data_analysis/uae_properties/raw_data/uae_properties.csv"
+    raw_dataset = "/Users/pedramjalali/documents/data_analysis/uae_properties/dataset/raw_data/uae_properties.csv"
 
     cleaner = DataCleaner(raw_data_path=raw_dataset, uae_cities=UAEInfo.uae_cities())
     data = cleaner.read_raw_data()
@@ -24,16 +26,16 @@ if __name__ == "__main__":
 
 
     # CHECK FOR DATA TYPES
-    #cleaner.numeric_columns()
-    #cleaner.object_columns()
-    #cleaner.date_columns()
-    #cleaner.convert_to_date_type()
+    cleaner.numeric_columns()
+    cleaner.object_columns()
+    cleaner.date_columns()
+    cleaner.convert_to_date_type()
     
 
 
     # HANDLING MISSING VALUES 
-    #cleaner.impute_missing_values()
-    #cleaner.drop_missing_rent_values()
+    cleaner.impute_missing_values()
+    cleaner.drop_missing_rent_values()
 
 
     
@@ -55,8 +57,8 @@ if __name__ == "__main__":
         #cleaner.outlier_detection(column)
 
 
-    #saver = DataSaver()
-    #saver.save_clean_data(cleaner.df)
+    saver = DataSaver()
+    saver.save_clean_data(cleaner.df)
 
 
     #load_to_db = LoadToDB()
@@ -64,5 +66,4 @@ if __name__ == "__main__":
     #load_to_db.create_engine()
     #load_to_db.load_to_db()
 
-    print(data["Beds"].unique())
     

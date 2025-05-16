@@ -33,6 +33,7 @@ class LoadToDB:
         self.host = os.getenv('DB_HOST')
         self.port = os.getenv('DB_PORT')
         self.dbname = "uae_properties"
+        self.connection_url = f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
         self.target_dataset = pd.read_csv(file_path)
 
 
@@ -66,8 +67,8 @@ class LoadToDB:
 
     def create_engine(self):
         try:
-            connection_url = f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
-            engine = create_engine(connection_url)
+            
+            engine = create_engine(self.connection_url)
             logging.info("PostgreSQL engine created.")
             return engine
         except Exception as e:
