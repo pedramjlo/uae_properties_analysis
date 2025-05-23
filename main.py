@@ -26,6 +26,7 @@ if __name__ == "__main__":
 
 
     # CHECK FOR DATA TYPES
+    """
     cleaner.numeric_columns()
     cleaner.object_columns()
     cleaner.date_columns()
@@ -36,7 +37,9 @@ if __name__ == "__main__":
     # HANDLING MISSING VALUES 
     cleaner.impute_missing_values()
     cleaner.drop_missing_rent_values()
+    """
 
+    cleaner.drop_duplicate_rows()
 
     
 
@@ -57,8 +60,8 @@ if __name__ == "__main__":
         #cleaner.outlier_detection(column)
 
 
-    saver = DataSaver()
-    saver.save_clean_data(cleaner.df)
+    #saver = DataSaver()
+    #saver.save_clean_data(cleaner.df)
 
 
     #load_to_db = LoadToDB()
@@ -66,4 +69,4 @@ if __name__ == "__main__":
     #load_to_db.create_engine()
     #load_to_db.load_to_db()
 
-    
+    #print(data["City"].unique())

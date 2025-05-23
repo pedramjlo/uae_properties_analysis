@@ -147,3 +147,19 @@ class DataCleaner:
 
     
     
+
+    def drop_duplicate_rows(self):
+        total_rows = self.df.shape[0]
+        duplicate_rows = self.df.duplicated().sum()
+        
+        try:
+            df_no_duplicates = self.df.drop_duplicates()
+            if self.df.duplicated().sum() == duplicate_rows:
+                logging.info("No duplicate rows were found")
+            else:
+                removed_rows = self.df.duplicated().sum() - total_rows
+                logging.info(f"{removed_rows} rows were removed")
+        except Exception as e:
+            logging.error(f"Failed to drop duplicate rows, {e}")
+            
+

@@ -10,6 +10,10 @@ from dotenv import load_dotenv
 
 from urllib.parse import quote_plus
 
+# Dynamically get the root directory of the project
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 
 
 logging.basicConfig(
@@ -19,10 +23,6 @@ logging.basicConfig(
 )
 
 load_dotenv()
-
-
-# Dynamically get the root directory of the project
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 

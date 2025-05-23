@@ -1,11 +1,12 @@
 """
-This file contains information about the United Arab Emirates
+This file contains information about the United Arab Emirates and cities
 which can be used in analysing process of the data for fature engineering and etc.
 """
 
 
 class UAEInfo:
 
+    @staticmethod
     def uae_cities():
         uae_cities = [
         "Dubai",
@@ -82,12 +83,5 @@ class UAEInfo:
     ]
         return uae_cities
 
-import requests
 
-url = 'https://releaseeuaestat.fcsc.gov.ae/rest/data/FCSA,DF_NA_COMP_CUR,3.4.0/.A.............?startPeriod=2015&dimensionAtObservation=AllDimensions'
-
-params = {
-    "city": "Dubai"
-}
-
-print(requests.get(url, params=None).json)
+    
