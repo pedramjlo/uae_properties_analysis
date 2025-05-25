@@ -1,142 +1,142 @@
 -- Active: 1744916696249@@localhost@5432@uae_properties
 -- ALL_CITIES 
-SELECT DISTINCT "City"
+SELECT DISTINCT "city"
 FROM uae_properties;
 
 
--- name: MEDIAN_RENT_PER_CITY
-WITH MEDIAN_RENT_PER_CITY AS (
+-- name: MEDIAN_rent_PER_city
+WITH MEDIAN_rent_PER_city AS (
     SELECT 
-        "City", 
-        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY "Rent") AS "median_annual_rent"
+        "city", 
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY "rent") AS "median_annual_rent"
     FROM uae_properties
-    GROUP BY "City"
+    GROUP BY "city"
 )
 SELECT 
-    "City", 
+    "city", 
     "median_annual_rent" as "median_annual_rent",
     ROUND(("median_annual_rent" / 12)::numeric, 2) AS "median_monthly_rent",
     RANK() OVER (ORDER BY "median_annual_rent" DESC) AS Rank
-FROM MEDIAN_RENT_PER_CITY;
+FROM MEDIAN_rent_PER_city;
 
 
 
 
--- name: TOP_20_MOST_EXPENSIVE_LOCATIONS
-WITH EXPENSIVE_LOCATION_PER_CITY as (
+-- name: TOP_20_MOST_EXPENSIVE_lOCATIONS
+WITH EXPENSIVE_lOCATION_PER_city as (
     SELECT
-        "City",
-        "Location",
-        "Address",
-        "Rent" as "annual_rent"
+        "city",
+        "location",
+        "address",
+        "rent" as "annual_rent"
     FROM uae_properties
-    GROUP BY "City", "Location",  "Address", "annual_rent"
+    GROUP BY "city", "location",  "address", "annual_rent"
 )
 SELECT 
-    "City",
-    "Location",
-     "Address",
+    "city",
+    "location",
+     "address",
     "annual_rent"
-FROM EXPENSIVE_LOCATION_PER_CITY
+FROM EXPENSIVE_lOCATION_PER_city
 ORDER BY "annual_rent" DESC
 LIMIT 20;
 
 
 
--- name: MOST_AFFORDABLE_LOCATIONS
-WITH AFFORDABLE_LOCATION_PER_CITY as (
+-- name: MOST_AFFORDABLE_lOCATIONS
+WITH AFFORDABLE_lOCATION_PER_city as (
     SELECT
-        "City",
-        "Location",
-        "Address",
-        "Rent" as "annual_rent"
+        "city",
+        "location",
+        "address",
+        "rent" as "annual_rent"
     FROM uae_properties
-    GROUP BY "City", "Location", "Address", "annual_rent"
+    GROUP BY "city", "location", "address", "annual_rent"
 )
 SELECT 
-    "City",
-    "Location",
-    "Address",
+    "city",
+    "location",
+    "address",
     "annual_rent"
-FROM AFFORDABLE_LOCATION_PER_CITY
+FROM AFFORDABLE_lOCATION_PER_city
 ORDER BY "annual_rent" ASC;
 
 
 
--- name: AVERAGE_AREA_BY_PROPERTY_TYPE
-WITH AVERAGE_AREA_BY_TYPE AS (
+-- name: AVERAGE_AREA_BY_PROPERTY_type
+WITH AVERAGE_AREA_BY_type AS (
     SELECT 
-        "City",
-        "Type",
-        ROUND(AVG("Area_in_sqft"), 3) AS average_area_in_sqrft
+        "city",
+        "type",
+        ROUND(AVG("area_in_sqft"), 3) AS average_area_in_sqrft
     FROM uae_properties
-    GROUP BY "City", "Type"
+    GROUP BY "city", "type"
 ),
-AVERAGE_BEDROOMS_BY_TYPE AS (
+AVERAGE_BEDROOMS_BY_type AS (
     SELECT 
-        "City",
-        "Type",
-        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY "Beds") AS median_beds_number
+        "city",
+        "type",
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY "beds") AS median_beds_number
     FROM uae_properties
-    WHERE "Type" NOT IN ('Residential Plot') AND "Beds" <> 0
-    GROUP BY "City", "Type"
+    WHERE "type" NOT IN ('Residential Plot') AND "beds" <> 0
+    GROUP BY "city", "type"
 )
 SELECT
-    a."City",
-    a."Type",
+    a."city",
+    a."type",
     a."average_area_in_sqrft",
     b."median_beds_number"
-FROM AVERAGE_AREA_BY_TYPE a
-JOIN AVERAGE_BEDROOMS_BY_TYPE b 
-    ON a."Type" = b."Type"
-    AND a."City" = b."City"
-ORDER BY a."City", a."Type", a."average_area_in_sqrft" DESC
+FROM AVERAGE_AREA_BY_type a
+JOIN AVERAGE_BEDROOMS_BY_type b 
+    ON a."type" = b."type"
+    AND a."city" = b."city"
+ORDER BY a."city", a."type", a."average_area_in_sqrft" DESC
 LIMIT 20;
 
 
--- name: MOST_EXPENSIVE_LOCATIONS_BY_CITY 
-WITH MOST_EXPENSIVE_LOCATION AS (
+-- name: MOST_EXPENSIVE_lOCATIONS_BY_city 
+WITH MOST_EXPENSIVE_lOCATION AS (
     SELECT 
-        "City",
-        "Location",
-        ROUND(AVG("Rent"), 2) AS average_rent,
+        "city",
+        "location",
+        ROUND(AVG("rent"), 2) AS average_rent,
         ROW_NUMBER() OVER (
-            PARTITION BY "City"
-            ORDER BY AVG("Rent") DESC
+            PARTITION BY "city"
+            ORDER BY AVG("rent") DESC
         ) AS row_number
     FROM uae_properties
-    GROUP BY "City", "Location"
+    GROUP BY "city", "location"
 )
 SELECT 
-    "City",
-    "Location",
+    "city",
+    "location",
     average_rent
-FROM MOST_EXPENSIVE_LOCATION
+FROM MOST_EXPENSIVE_lOCATION
 WHERE row_number = 1
-ORDER BY "City" ASC;
+ORDER BY "city" ASC;
 
 
 
--- name: MOST_AFFORDABLE_LOCATIONS_BY_CITY
-WITH MOST_AFFORDABLE_LOCATION AS (
+-- name: MOST_AFFORDABLE_lOCATIONS_BY_city
+WITH MOST_AFFORDABLE_lOCATION AS (
     SELECT 
-        "City",
-        "Location",
-        ROUND(AVG("Rent"), 2) AS "average_annual_rent",
+        "city",
+        "location",
+        ROUND(AVG("rent"), 2) AS "average_annual_rent",
         ROW_NUMBER() OVER (
-            PARTITION BY "City"
-            ORDER BY AVG("Rent") ASC
+            PARTITION BY "city"
+            ORDER BY AVG("rent") ASC
         ) AS row_number
     FROM uae_properties
-    GROUP BY "City", "Location"
+    GROUP BY "city", "location"
 )
 SELECT 
-    "City",
-    "Location",
+    "city",
+    "location",
     "average_annual_rent"
-FROM MOST_AFFORDABLE_LOCATION
+FROM MOST_AFFORDABLE_lOCATION
 WHERE row_number = 1
-ORDER BY "City" ASC;
+ORDER BY "city" ASC;
 
 
 
