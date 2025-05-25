@@ -27,7 +27,7 @@ except Exception as e:
 selected_category = st.selectbox("Select city", categories)
 
 # Read SQL query file
-with open("analysis/main.sql") as f:
+with open("analysis/national_stats/main.sql") as f:
     sql = f.read()
 
 # Run parameterized query
@@ -37,9 +37,3 @@ except Exception as e:
     st.error(f"Error executing query: {e}")
     st.stop()
 
-# Plot results
-if not df.empty:
-    st.subheader(f"All cities: {selected_category}")
-    st.line_chart(df.set_index("month")["total_revenue"])
-else:
-    st.write("No data available for this city.")

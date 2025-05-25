@@ -2,5 +2,5 @@
 .venv
 ./DS_STORE
 /data_extraction
-/analysis
+
 .DS_STORE
