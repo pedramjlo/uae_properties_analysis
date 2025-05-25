@@ -48,7 +48,7 @@ class Database:
             logging.error(f"Failed to establish connection to the db, {e}")
 
         # CHECK WHETHER THE DB EXISTS
-        cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (self.dbname,))
+        cur.execute("SELECT 1 FROM uae_properties WHERE datname = %s", (self.dbname,))
         exists = cur.fetchone()
 
         # CREATE THE DB IF IT DOESNT EXIST
