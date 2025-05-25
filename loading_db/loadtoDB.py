@@ -26,8 +26,8 @@ load_dotenv()
 
 
 
-class LoadToDB:
-    def __init__(self, file_path=os.path.join(PROJECT_ROOT, "cleaned_data", "cleaned_uae_properties_data.csv")):
+class Database:
+    def __init__(self, file_path=os.path.join(PROJECT_ROOT, "dataset", "cleaned_data/cleaned_uae_properties_data.csv")):
         self.user = os.getenv('DB_USER')
         self.password = quote_plus(os.getenv('DB_PASSWORD'))
         self.host = os.getenv('DB_HOST')
@@ -73,7 +73,7 @@ class LoadToDB:
             return engine
         except Exception as e:
             logging.error("Failed to create PostgreSQL engine", exc_info=True)
-            raise
+            raise 
 
 
     def load_to_db(self):
@@ -86,4 +86,11 @@ class LoadToDB:
             logging.error(f"Failed to load the data to PostgreSQL, {e}")
             
 
-
+    def get_connection(self):
+        return psycopg2.connect(
+        host=os.getenv(self.host),
+        database=os.getenv(self.dbname),
+        user=os.getenv(self.user),
+        password=os.getenv(self.password),
+        port=os.getenv(self.port, 5432)
+    )
