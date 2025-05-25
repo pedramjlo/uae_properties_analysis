@@ -46,11 +46,10 @@ class AnalysisUtility:
     """
     creating directories named after each for more specific analysis inside teh parent city analysis directory
     """
-
     def create_every_city_dir(self, cities_list):
         cities_analysis_dir = os.path.join(PROJECT_ROOT, self.parent_analysis_dir, self.cities_analysis_parent_dir)
         for city_dir in cities_list:
-            dir_path = os.path.join(cities_analysis_dir, city_dir)
+            dir_path = os.path.join(cities_analysis_dir, city_dir.title())
             if os.path.isdir(dir_path):
                 logging.warning(f"{dir_path} already exists!")
             else:
@@ -63,4 +62,4 @@ class AnalysisUtility:
 
 at = AnalysisUtility()
 at.create_city_analysis_dir()
-at.create_every_city_dir(cities_list=['london', 'paris', 'berlin'])
+at.create_every_city_dir(cities_list=['london', 'abu dhabi', 'berlin'])
