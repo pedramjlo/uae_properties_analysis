@@ -10,7 +10,6 @@ from loading_db.loadtoDB import Database
 from analysis.sql.load_named_queries import load_named_queries 
 
 
-print(load_named_queries)
 
 
 # DB connection
@@ -19,7 +18,7 @@ engine = db.create_engine()
 
 # UI: Analysis scope
 cities = pd.read_sql("SELECT DISTINCT city FROM uae_properties", engine)["city"].tolist()
-options = ["National"] + sorted(cities)
+options = ["UAE National Analysis"] + sorted(cities)
 selected = st.selectbox("Choose analysis scope", options)
 
 # Load appropriate SQL file
