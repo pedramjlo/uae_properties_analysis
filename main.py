@@ -25,7 +25,6 @@ if __name__ == "__main__":
 
 
     # DATA CLEANING
-    """
     cleaner.create_city_column() 
     cleaner.remove_city_from_address() 
     cleaner.numeric_columns()
@@ -35,7 +34,8 @@ if __name__ == "__main__":
     cleaner.impute_missing_values()
     cleaner.drop_missing_rent_values()
     cleaner.drop_duplicate_rows()
-    """
+    cleaner.convert_columns_to_lowercase()
+
 
     
     
@@ -57,13 +57,13 @@ if __name__ == "__main__":
 
 
     # SAVING THE NEW CLEANED DATASET TO 'dataset/cleaned_data/'
-    #saver = DataSaver()
-    #saver.save_clean_data(cleaner.df)
+    saver = DataSaver()
+    saver.save_clean_data(cleaner.df)
 
 
-    #load_to_db = Database()
-    #load_to_db.create_database()
-    #load_to_db.create_engine()
-    #load_to_db.load_to_db()
+    load_to_db = Database()
+    load_to_db.create_database()
+    load_to_db.create_engine()
+    load_to_db.load_to_db()
 
     #print(data["City"].unique())

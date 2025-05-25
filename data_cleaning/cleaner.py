@@ -46,7 +46,7 @@ class DataCleaner:
                 except Exception as e:
                     logging.error(f"Failed to extract city names: {e}")
             else:
-                logging.error(f"Column {column_name} already exists!")
+                logging.warning(f"Column {column_name} already exists!")
         else:
             logging.error("Column 'Address' does not exist.")
 
@@ -146,7 +146,6 @@ class DataCleaner:
             logging.warning(f"Failed to drop rows with missing Rent values. {e}")
 
     
-    
 
     def drop_duplicate_rows(self):
         total_rows = self.df.shape[0]
@@ -163,3 +162,11 @@ class DataCleaner:
             logging.error(f"Failed to drop duplicate rows, {e}")
             
 
+
+    def convert_columns_to_lowercase(self):
+        try:
+            self.df.columns = self.df.columns.str.lower()
+            logging.info("Columns names converted to lowercase")
+        except Exception as e:
+            logging.error(f"Failed to convert columns to lowercase, {e}")
+            
