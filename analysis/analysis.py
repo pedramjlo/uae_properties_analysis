@@ -19,10 +19,11 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 
-class AnalysisUtility:
-    def __init__(self):
+class CityAnalysisUtility:
+    def __init__(self, cities_list):
         self.parent_analysis_dir = "analysis"
         self.cities_analysis_parent_dir = "cities_analysis"
+        self.cities_list = cities_list
 
 
     """
@@ -46,9 +47,9 @@ class AnalysisUtility:
     """
     creating directories named after each for more specific analysis inside teh parent city analysis directory
     """
-    def create_every_city_dir(self, cities_list):
+    def create_every_city_dir(self):
         cities_analysis_dir = os.path.join(PROJECT_ROOT, self.parent_analysis_dir, self.cities_analysis_parent_dir)
-        for city_dir in cities_list:
+        for city_dir in self.cities_list:
             dir_path = os.path.join(cities_analysis_dir, city_dir.title())
             if os.path.isdir(dir_path):
                 logging.warning(f"{dir_path} already exists!")
@@ -60,6 +61,10 @@ class AnalysisUtility:
 
 
 
-at = AnalysisUtility()
+
+
+
+
+at = CityAnalysisUtility()
 at.create_city_analysis_dir()
 at.create_every_city_dir(cities_list=['london', 'abu dhabi', 'berlin'])

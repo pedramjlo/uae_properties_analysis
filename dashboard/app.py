@@ -1,39 +1,36 @@
 import streamlit as st
 import pandas as pd
-import sys
-import os
+import sys, os
 
-# Add project root to sys.path for imports
+# Setup import path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from loading_db.loadtoDB import Database
 
-# Instantiate your Database class once
+
+from analysis.sql.load_named_queries import load_named_queries 
+
+
+
+
+# DB connection
 db = Database()
-
-st.set_page_config(page_title="SQL File Dashboard", layout="wide")
-st.title("📊 Dashboard from SQL File")
-
-# Create DB engine
 engine = db.create_engine()
 
-# Fetch categories (cities)
-try:
-    categories = pd.read_sql("SELECT DISTINCT city FROM uae_properties", engine)["city"].tolist()
-except Exception as e:
-    st.error(f"Error fetching cities: {e}")
-    st.stop()
+# UI: Analysis scope
+cities = pd.read_sql("SELECT DISTINCT city FROM uae_properties", engine)["city"].tolist()
+options = ["UAE National Analysis"] + sorted(cities)
+selected = st.selectbox("Choose analysis scope", options)
 
-selected_category = st.selectbox("Select city", categories)
+# Load appropriate SQL file
+if selected == "National":
+    queries = load_named_queries("analysis/sql/national_analysis/national.sql")
+    sql = queries["revenue_overview"]
+    df = pd.read_sql(sql, engine)
+else:
+    queries = load_named_queries("analysis/sql/cities_analysis/city.sql")
+    sql = queries["revenue_by_city"]
+    df = pd.read_sql(sql, engine, params={"city": selected})
 
-# Read SQL query file
-with open("analysis/national_stats/main.sql") as f:
-    sql = f.read()
-
-# Run parameterized query
-try:
-    df = pd.read_sql(sql, engine, params={"city": selected_category})
-except Exception as e:
-    st.error(f"Error executing query: {e}")
-    st.stop()
-
+# Display
+st.subheader(f"📊 {'UAE' if selected == 'National' else selected} Revenue Over Time")
+st.line_chart(df.set_index("month")["total_revenue"])
