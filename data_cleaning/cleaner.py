@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import re
 import logging
-
+from uae_info.uaeInfo import UAEInfo
 
 
 
@@ -36,6 +36,8 @@ class DataCleaner:
     """
     def create_city_column(self):
         column_name = "City"
+        uae_info = UAEInfo()
+        uae_cities = uae_info.uae_cities()
         if "Address" in self.df.columns:
             if column_name not in self.df.columns:
                 try:
@@ -152,11 +154,11 @@ class DataCleaner:
         duplicate_rows = self.df.duplicated().sum()
         
         try:
-            df_no_duplicates = self.df.drop_duplicates()
-            if self.df.duplicated().sum() == duplicate_rows:
+            if duplicate_rows == 0:
                 logging.info("No duplicate rows were found")
             else:
-                removed_rows = self.df.duplicated().sum() - total_rows
+                self.df = self.df.drop_duplicates()
+                removed_rows = total_rows - self.df.shape[0]
                 logging.info(f"{removed_rows} rows were removed")
         except Exception as e:
             logging.error(f"Failed to drop duplicate rows, {e}")
