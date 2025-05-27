@@ -1,7 +1,7 @@
 from data_cleaning.cleaner import DataCleaner # data_cleaning is treated as a python package
 from uae_info.uaeInfo import UAEInfo 
 from data_saving.dataSaver import DataSaver
-from loading_db.loadtoDB import Database
+from database_utils.databaseConfig import Database
 
 
 
@@ -61,9 +61,9 @@ if __name__ == "__main__":
     saver.save_clean_data(cleaner.df)
 
 
+    # LOADING THE SAVED CLEANED DATA TO POSTGRESQL DB
+
     load_to_db = Database()
     load_to_db.create_database()
     load_to_db.create_engine()
     load_to_db.load_to_db()
-
-    #print(data["City"].unique())
