@@ -21,6 +21,11 @@ class Pipeline:
         saver.save_clean_data(df=self.cleaned_data)
 
 
+    def load_data_to_db(self):
+        db = Database()
+        db.load_to_db()
+
+
 
 
 if __name__ == "__main__":
@@ -29,6 +34,7 @@ if __name__ == "__main__":
     pl = Pipeline(raw_data=raw_dataset)
     pl.data_cleaner()
     pl.data_saver()
+    pl.load_data_to_db()
 
 
 
