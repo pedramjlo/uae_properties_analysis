@@ -2,5 +2,5 @@
 .venv
 ./DS_STORE
 /data_extraction
-
+**/__pycache__/
 .DS_STORE

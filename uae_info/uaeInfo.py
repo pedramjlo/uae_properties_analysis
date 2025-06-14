@@ -6,9 +6,8 @@ which can be used in analysing process of the data for fature engineering and et
 
 class UAEInfo:
 
-    @staticmethod
-    def uae_cities():
-        uae_cities = [
+    def uae_cities(self):
+        return [
         "Dubai",
         "Abu Dhabi",
         "Sharjah",
@@ -81,7 +80,6 @@ class UAEInfo:
         "Wadi Shah",
         "Zubarah"
     ]
-        return uae_cities
 
 
     
