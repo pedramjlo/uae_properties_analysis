@@ -40,6 +40,7 @@ if __name__ == "__main__":
 
     pl = Pipeline(raw_data=raw_dataset)
     pl.data_cleaner()
+    pl.feature_engineering()
     pl.data_saver()
     pl.load_data_to_db()
 
