@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import re
 import logging
-from uae_info.uaeInfo import UAEInfo
 
 
 
@@ -12,17 +11,99 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
 )
 
+
+
+class UAEInfo:
+    
+    @staticmethod
+    def uae_cities():
+        return [
+        "Dubai",
+        "Abu Dhabi",
+        "Sharjah",
+        "Al Ain",
+        "Ajman",
+        "Ras Al Khaimah",
+        "Fujairah",
+        "Umm Al Quwain",
+        "Kalba",
+        "Dibba Al-Fujairah",
+        "Madinat Zayed",
+        "Khor Fakkan",
+        "Al Dhannah",
+        "Ghayathi",
+        "Dhaid",
+        "Jebel Ali",
+        "Liwa Oasis",
+        "Hatta",
+        "Ar-Rams",
+        "Dibba Al-Hisn",
+        "Al Jazirah Al Hamra",
+        "Al Mirfa",
+        "Masfut",
+        "Masafi",
+        "Al Madam",
+        "Al Manama",
+        "Al Khawaneej",
+        "Al Awir",
+        "Al Faqa",
+        "Al Lisaili",
+        "Sweihan",
+        "Dalma",
+        "Falaj Al Mualla",
+        "Sila",
+        "Al Badiyah",
+        "Al Jeer",
+        "Al Hamriyah",
+        "Al Ajban",
+        "Al Yahar",
+        "Al Bataeh",
+        "Al Ruwayyah",
+        "Al Nakhil",
+        "Al Nuaimia",
+        "Al Gharbia",
+        "Al Aryam",
+        "Al Qusaidat",
+        "Al Qor",
+        "Al Salamah",
+        "Al Shuwaib",
+        "Al Rafaah",
+        "Al Rashidya",
+        "Asimah",
+        "Dadna",
+        "Digdaga",
+        "Ghalilah",
+        "Ghayl",
+        "Ghub",
+        "Habshan",
+        "Huwaylat",
+        "Khatt",
+        "Khor Khwair",
+        "Lahbab",
+        "Manama",
+        "Marawah",
+        "Mirbah",
+        "Mleiha",
+        "Nahil",
+        "Qidfa",
+        "Sha'am",
+        "Wadi Shah",
+        "Zubarah"
+    ]
+
+
+
+
 class DataCleaner:
-    def __init__(self, raw_data_path, uae_cities):
-        self.raw_data_path = raw_data_path
-        self.uae_cities = uae_cities
+    def __init__(self, raw_data):
+        self.raw_data = raw_data
         self.df = None
 
     def read_raw_data(self):
         try:
-            self.df = pd.read_csv(self.raw_data_path, encoding="ISO-8859-1", engine='python')
+            self.df = pd.read_csv(self.raw_data, encoding="ISO-8859-1", engine='python')
             logging.info("Read the dataset successfully.")
-            return self.df
+            return pd.DataFrame(self.df)
         except FileNotFoundError:
             logging.error("Error: The file was not found.")
         except pd.errors.EmptyDataError:
@@ -36,13 +117,12 @@ class DataCleaner:
     """
     def create_city_column(self):
         column_name = "City"
-        uae_info = UAEInfo()
-        uae_cities = uae_info.uae_cities()
+        uae_cities = UAEInfo.uae_cities()
         if "Address" in self.df.columns:
             if column_name not in self.df.columns:
                 try:
                     # Match city only if it appears after a comma at the end of the string
-                    pattern = r",\s*(" + "|".join(map(re.escape, self.uae_cities)) + r")\s*$"
+                    pattern = r",\s*(" + "|".join(map(re.escape, uae_cities)) + r")\s*$"
                     self.df[column_name] = self.df["Address"].str.extract(pattern, flags=re.IGNORECASE)
                     logging.info(f"Extracted city names to column {column_name}.")
                 except Exception as e:
@@ -52,13 +132,15 @@ class DataCleaner:
         else:
             logging.error("Column 'Address' does not exist.")
 
+
     """
     After extracting the city name from the address column and adding it to the new City column,
     it's removed from Address 
     """
     def remove_city_from_address(self):
+        uae_cities = UAEInfo.uae_cities()
         if "Address" in self.df.columns:
-            for city in self.uae_cities:
+            for city in uae_cities:
                 removing_pattern = fr",?\s*{city}\s*" 
                 self.df["Address"] = self.df["Address"].str.replace(removing_pattern, '', regex=True)
             logging.info("City names removed from Address column")
@@ -101,6 +183,7 @@ class DataCleaner:
     
     
 
+    """
     # USING IQR METHOD
     def outlier_detection(self, column):
         if not pd.api.types.is_numeric_dtype(self.df[column]):
@@ -118,6 +201,8 @@ class DataCleaner:
         percentage = (len(outliers) / len(self.df)) * 100
         logging.info(f"{percentage:.2f}% of the values in column '{column}' are outliers.")
         return outliers
+    """
+    
     
 
     """
@@ -140,7 +225,7 @@ class DataCleaner:
         try:
             """
             A minimum threshold of 700 AED has been set for rent rates; 
-            any records falling below this threshold are dropped.
+            any record falling below this threshold is dropped.
             """
             self.df = self.df[self.df["Rent"].notnull() & (self.df["Rent"] > 700)]
             logging.info("Dropped rows with missing Rent values and below 700 AED.")
@@ -165,10 +250,26 @@ class DataCleaner:
             
 
 
+    # SQL standard naming
     def convert_columns_to_lowercase(self):
         try:
             self.df.columns = self.df.columns.str.lower()
             logging.info("Columns names converted to lowercase")
         except Exception as e:
             logging.error(f"Failed to convert columns to lowercase, {e}")
+
+
+    def clean_all(self):
+        self.read_raw_data()
+        self.remove_city_from_address()
+        self.numeric_columns()
+        self.object_columns()
+        self.date_columns()
+        self.convert_to_date_type()
+        self.impute_missing_values()
+        self.drop_missing_rent_values()
+        self.drop_duplicate_rows()
+        self.convert_columns_to_lowercase()
+        return self.df
             
+
