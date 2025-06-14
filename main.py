@@ -1,8 +1,9 @@
 import pandas as pd
+
 from data_cleaning.cleaner import DataCleaner # data_cleaning is treated as a python package
-from uae_info.uaeInfo import UAEInfo 
 from data_saving.dataSaver import DataSaver
 from database_utils.databaseConfig import Database
+from feature_engineering.feature_engineering import FeatureEngineering
 
 
 
@@ -16,6 +17,11 @@ class Pipeline:
         self.cleaned_data = cleaner.clean_all()
 
 
+    def feature_engineering(self):
+        fe = FeatureEngineering(df=self.cleaned_data)
+        fe.run_feature_engineering
+
+
     def data_saver(self):
         saver = DataSaver()
         saver.save_clean_data(df=self.cleaned_data)
@@ -23,8 +29,9 @@ class Pipeline:
 
     def load_data_to_db(self):
         db = Database()
-        db.load_to_db()
+        db.run_db()
 
+    
 
 
 
@@ -45,12 +52,4 @@ if __name__ == "__main__":
 
 
 
-    # LOADING THE SAVED CLEANED DATA TO POSTGRESQL DB
-
-    """
-    load_to_db = Database()
-    load_to_db.create_database()
-    load_to_db.create_engine()
-    load_to_db.load_to_db()
-    """
     

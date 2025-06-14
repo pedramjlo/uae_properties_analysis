@@ -86,6 +86,11 @@ class Database:
             logging.error(f"Failed to load the data to PostgreSQL: {e}")
 
 
+    def run_db(self):
+        self.create_database()
+        self.create_engine()
+        self.load_to_db()
+
     def get_connection(self):
         return psycopg2.connect(
             host=self.host,
