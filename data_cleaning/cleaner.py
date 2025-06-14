@@ -95,7 +95,7 @@ class UAEInfo:
 
 
 class DataCleaner:
-    def __init__(self, raw_data):
+    def __init__(self, raw_data: pd.DataFrame):
         self.raw_data = raw_data
         self.df = None
 
@@ -112,40 +112,9 @@ class DataCleaner:
             logging.error("Error: The file could not be parsed.")
 
     
-    """
-    City names from the Address column are extracted and added to a new column City
-    """
-    def create_city_column(self):
-        column_name = "City"
-        uae_cities = UAEInfo.uae_cities()
-        if "Address" in self.df.columns:
-            if column_name not in self.df.columns:
-                try:
-                    # Match city only if it appears after a comma at the end of the string
-                    pattern = r",\s*(" + "|".join(map(re.escape, uae_cities)) + r")\s*$"
-                    self.df[column_name] = self.df["Address"].str.extract(pattern, flags=re.IGNORECASE)
-                    logging.info(f"Extracted city names to column {column_name}.")
-                except Exception as e:
-                    logging.error(f"Failed to extract city names: {e}")
-            else:
-                logging.warning(f"Column {column_name} already exists!")
-        else:
-            logging.error("Column 'Address' does not exist.")
+    
 
 
-    """
-    After extracting the city name from the address column and adding it to the new City column,
-    it's removed from Address 
-    """
-    def remove_city_from_address(self):
-        uae_cities = UAEInfo.uae_cities()
-        if "Address" in self.df.columns:
-            for city in uae_cities:
-                removing_pattern = fr",?\s*{city}\s*" 
-                self.df["Address"] = self.df["Address"].str.replace(removing_pattern, '', regex=True)
-            logging.info("City names removed from Address column")
-        else:
-            logging.error("The column 'Address' does not exist.")
 
 
     def numeric_columns(self):

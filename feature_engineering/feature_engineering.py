@@ -1,4 +1,4 @@
-
+import pandas as pd
 import re
 import logging
 from uae_info.uaeInfo import UAEInfo
@@ -94,7 +94,7 @@ class UAEInfo:
 
 
 class FeatureEngineering:
-    def __init__(self, df):
+    def __init__(self, df: pd.DataFrame):
         self.df = df
 
 
